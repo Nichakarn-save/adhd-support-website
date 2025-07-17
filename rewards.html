@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบรางวัล - ADHD Support</title>
+    <link rel="manifest" href="manifest.json" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .page-title {
+            font-size: 2em;
+            color: #333;
+            font-weight: bold;
+            text-align: center;
+            flex: 1;
+        }
+
+        .current-points {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Points Summary */
+        .points-summary {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .points-display {
+            font-size: 4em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .points-label {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .points-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .points-source {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .points-source:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .source-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .source-label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .source-points {
+            font-size: 1.2em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        /* Rewards Section */
+        .rewards-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rewards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .reward-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reward-card.available {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+
+        .reward-card.locked {
+            opacity: 0.7;
+            filter: grayscale(30%);
+        }
+
+        .reward-card.claimed {
+            border-color: #ffc107;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        }
+
+        .reward-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .reward-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .reward-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .reward-cost {
+            background: #667eea;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .reward-cost.free {
+            background: #28a745;
+        }
+
+        .reward-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .reward-description {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .reward-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reward-btn.claim {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .reward-btn.claim:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .reward-btn.locked {
+            background: #6c757d;
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .reward-btn.claimed {
+            background: #ffc107;
+            color: #333;
+            cursor: default;
+        }
+
+        .reward-status {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .status-available {
+            background: #28a745;
+            color: white;
+        }
+
+        .status-locked {
+            background: #6c757d;
+            color: white;
+        }
+
+        .status-claimed {
+            background: #ffc107;
+            color: #333;
+        }
+
+        /* Special Rewards */
+        .special-rewards {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            border: 3px solid #ff6b9d;
+        }
+
+        .special-rewards .section-title {
+            color: #d63384;
+        }
+
+        /* Daily Rewards */
+        .daily-rewards {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .daily-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .daily-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .daily-card.today {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            animation: pulse 2s infinite;
+        }
+
+        .daily-card.claimed {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+
+        .daily-card.missed {
+            opacity: 0.5;
+            filter: grayscale(50%);
+        }
+
+        .daily-day {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .daily-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .daily-points {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 0.9em;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Achievements Timeline */
+        .achievements-timeline {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            border-radius: 50%;
+        }
+
+        .timeline-icon {
+            font-size: 2em;
+            margin-right: 20px;
+            min-width: 60px;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .timeline-description {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .timeline-reward {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .timeline-date {
+            color: #999;
+            font-size: 0.8em;
+            margin-left: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .page-title {
+                font-size: 1.5em;
+            }
+
+            .current-points {
+                font-size: 1em;
+            }
+
+            .points-display {
+                font-size: 3em;
+            }
+
+            .rewards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .daily-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+
+            .daily-card {
+                padding: 15px;
+            }
+
+            .timeline-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .timeline-icon {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide-up {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header fade-in">
+            <a href="progress.html" class="back-btn">
+                ← กลับหน้าก่อนหน้า
+            </a>
+            <div class="page-title">🎁 ระบบรางวัล</div>
+            <div class="current-points">
+                <span>⭐</span>
+                <span id="current-points">142</span>
+                <span>แต้ม</span>
+            </div>
+        </div>
+
+        <!-- Points Summary -->
+        <div class="points-summary fade-in">
+            <div class="points-display" id="points-display">142</div>
+            <div class="points-label">แต้มสะสมทั้งหมด</div>
+            
+            <div class="points-breakdown">
+                <div class="points-source">
+                    <div class="source-icon">🎯</div>
+                    <div class="source-label">เกมความจำ</div>
+                    <div class="source-points">+45 แต้ม</div>
+                </div>
+                <div class="points-source">
+                    <div class="source-icon">🧘‍♀️</div>
+                    <div class="source-label">การผ่อนคลาย</div>
+                    <div class="source-points">+38 แต้ม</div>
+                </div>
+                <div class="points-source">
+                    <div class="source-icon">📅</div>
+                    <div class="source-label">ปฏิบัติตามตาราง</div>
+                    <div class="source-points">+32 แต้ม</div>
+                </div>
+                <div class="points-source">
+                    <div class="source-icon">🎨</div>
+                    <div class="source-label">กิจกรรมสร้างสรรค์</div>
+                    <div class="source-points">+27 แต้ม</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Daily Rewards -->
+        <div class="daily-rewards slide-up">
+            <div class="section-title">
+                <span>📅</span>
+                รางวัลประจำวัน
+            </div>
+            <div class="daily-grid">
+                <div class="daily-card claimed">
+                    <div class="daily-day">วันจันทร์</div>
+                    <div class="daily-icon">🎯</div>
+                    <div class="daily-points">+5 แต้ม</div>
+                </div>
+                <div class="daily-card claimed">
+                    <div class="daily-day">วันอังคาร</div>
+                    <div class="daily-icon">🏆</div>
+                    <div class="daily-points">+8 แต้ม</div>
+                </div>
+                <div class="daily-card today">
+                    <div class="daily-day">วันพุธ</div>
+                    <div class="daily-icon">⭐</div>
+                    <div class="daily-points">+10 แต้ม</div>
+                </div>
+                <div class="daily-card">
+                    <div class="daily-day">วันพฤหัส</div>
+                    <div class="daily-icon">🎁</div>
+                    <div class="daily-points">+12 แต้ม</div>
+                </div>
+                <div class="daily-card">
+                    <div class="daily-day">วันศุกร์</div>
+                    <div class="daily-icon">💎</div>
+                    <div class="daily-points">+15 แต้ม</div>
+                </div>
+                <div class="daily-card">
+                    <div class="daily-day">วันเสาร์</div>
+                    <div class="daily-icon">🌟</div>
+                    <div class="daily-points">+18 แต้ม</div>
+                </div>
+                <div class="daily-card">
+                    <div class="daily-day">วันอาทิตย์</div>
+                    <div class="daily-icon">🎊</div>
+                    <div class="daily-points">+25 แต้ม</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rewards Section -->
+        <div class="rewards-section slide-up">
+            <div class="section-title">
+                <span>🎁</span>
+                รางวัลแลกแต้ม
+            </div>
+            
+            <div class="rewards-grid">
+                <div class="reward-card available">
+                    <div class="reward-status status-available">พร้อมแลก</div>
+                    <div class="reward-header">
+                        <div class="reward-icon">🎵</div>
+                        <div class="reward-cost">
+                            <span>⭐</span>
+                            <span>25</span>
+                        </div>
+                    </div>
+                    <div class="reward-title">เพลงโปรด 30 นาที</div>
+                    <div class="reward-description">ฟังเพลงที่ชอบขณะทำกิจกรรม 30 นาที</div>
+                    <button class="reward-btn claim" onclick="claimReward(this, 25)">แลกรางวัล</button>
+                </div>
+
+                <div class="reward-card available">
+                    <div class="reward-status status-available">พร้อมแลก</div>
+                    <div class="reward-header">
+                        <div class="reward-icon">🍕</div>
+                        <div class="reward-cost">
+                            <span>⭐</span>
+                            <span>50</span>
+                        </div>
+                    </div>
+                    <div class="reward-title">อาหารโปรด</div>
+                    <div class="reward-description">สั่งอาหารที่ชอบ หรือไปกินข้าวนอกบ้าน</div>
+                    <button class="reward-btn claim" onclick="claimReward(this, 50)">แลกรางวัล</button>
+                </div>
+
+                <div class="reward-card available">
+                    <div class="reward-status status-available">พร้อมแลก</div>
+                    <div class="reward-header">
+                        <div class="reward-icon">🎮</div>
+                        <div class="reward-cost">
+                            <span>⭐</span>
+                            <span>30</span>
+                        </div>
+                    </div>
+                    <div class="reward-title">เวลาเล่นเกม</div>
+                    <div class="reward-description">เล่นเกมโปรดได้ 1 ชั่วโมงเพิ่มเติม</div>
+                    <button class="reward-btn claim" onclick="claimReward(this, 30)">แลกรางวัล</button>
+                </div>
+
+                <div class="reward-card locked">
+                    <div class="reward-status status-locked">ยังไม่ได้</div>
+                    <div class="reward-header">
+                        <div class="reward-icon">🎬</div>
+                        <div class="reward-cost">
+                            <span>⭐</span>
+                            <span>75</span>
+                        </div>
+                    </div>
+                    <div class="reward-title">ดูหนังใหม่</div>
+                    <div class="reward-description">ไปดูหนังใหม่ที่โรงภาพยนตร์</div>
+                    <button class="reward-btn locked">ต้องการ 75 แต้ม</button>
+                </div>
+
+                <div class="reward-card locked">
+                    <div class="reward-status status-locked">ยังไม่ได้</div>
+                    <div class="reward-header">
+                        <div class="reward-icon">🛍️</div>
+                        <div class="reward-cost">
+                            <span>⭐</span>
+                            <span>100</span>
+                        </div>
+                    </div>
+                    <div class="reward-title">ช้อปปิ้งของโปรด</div>
+                    <div class="reward-description">ซื้อของที่ต้องการ งบประมาณ 500 บาท</div>
+                    <button class="reward-btn locked">ต้องการ 100 แต้ม</button>
+                </div>
+
+                <div class="reward-card claimed">
+                    <div class="reward-status status-claimed">แลกแล้ว</div>
+                    <div class="reward-header">
+                        <div class="reward-icon">📚</div>
+                        <div class="reward-cost">
+                            <span>⭐</span>
+                            <span>20</span>
+                        </div>
+                    </div>
+                    <div class="reward-title">หนังสือใหม่</div>
+                    <div class="reward-description">ซื้อหนังสือเล่มใหม่ที่สนใจ</div>
+                    <button class="reward-btn claimed">ได้รับแล้ว ✓</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Special Rewards -->
+        <div class="rewards-section special-rewards slide-up">
+            <div class="section-title">
+                <span>🌟</span>
+                รางวัลพิเศษ
+            </div>
+            
+            <div class="rewards-grid">
+                <div class="reward-card locked">
+                    <div class="reward-status status-locked">รางวัลพิเศษ</div>
+                    <div class="reward-header">
+                        <div class="reward-icon">🏖️</div>
+                        <div class="reward-cost">
+                            <span>⭐</span>
+                            <span>300</span>
+                        </div>
+                    </div>
+                    <div class="reward-title">ทริปสุดสัปดาห์</div>
+                    <div class="reward-description">ไปเที่ยวที่ต้องการ 2 วัน 1 คืน</div>
+                    <button class="reward-btn locked">ต้องการ 300 แต้ม</button>
+                </div>
+
+                <div class="reward-card locked">
+                    <div class="reward-status status-locked">รางวัลพิเศษ</div>
+                    <div class="reward-header">
+                        <div class="reward-icon">💻</div>
+                        <div class="reward-cost">
+                            <span>⭐</span>
+                            <span>500</span>
+                        </div>
+                    </div>
+                    <div class="reward-title">อุปกรณ์ใหม่</div>
+                    <div class="reward-description">ซื้อแก็ดเจ็ตหรืออุปกรณ์ที่ต้องการ</div>
+                    <button class="reward-btn locked">ต้องการ 500 แต้ม</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements Timeline -->
+        <div class="achievements-timeline slide-up">
+            <div class="section-title">
+                <span>🏆</span>
+                ประวัติรางวัล
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-icon">🎵</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">แลกเพลงโปรด 30 นาที</div>
+                    <div class="timeline-description">ฟังเพลงขณะทำการบ้าน</div>
+                    <div class="timeline-reward">-25 แต้ม</div>
+                </div>
+                <div class="timeline-date">วันนี้</div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-icon">📚</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">แลกหนังสือใหม่</div>
+                    <div class="timeline-description">ซื้อหนังสือการ์ตูนเล่มใหม่</div>
+                    <div class="timeline-reward">-20 แต้ม</div>
+                </div>
+                <div class="timeline-date">3 วันที่แล้ว</div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-icon">🎯</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">ได้รางวัลนักจำมืออาชีพ</div>
+                    <div class="timeline-description">เล่นเกมความจำครบ 10 ครั้ง</div>
+                    <div class="timeline-reward">+15 แต้ม</div>
+                </div>
+                <div class="timeline-date">1 สัปดาห์ที่แล้ว</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notification-text"></span>
+    </div>
+
+    <script>
+    let currentPoints = 142;
+
+    function updatePointsDisplay() {
+        document.getElementById('current-points').textContent = currentPoints;
+        document.getElementById('points-display').textContent = currentPoints;
+    }
+
+    function showNotification(message, isError = false) {
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notification-text');
+        
+        notificationText.textContent = message;
+        notification.className = 'notification show';
+        
+        if (isError) {
+            notification.classList.add('error');
+        } else {
+            notification.classList.remove('error');
+        }
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => {
+                notification.classList.remove('error');
+            }, 300);
+        }, 3000);
+    }
+
+    function claimReward(button, cost) {
+        if (currentPoints >= cost) {
+            currentPoints -= cost;
+            updatePointsDisplay();
+            
+            const card = button.closest('.reward-card');
+            card.classList.remove('available');
+            card.classList.add('claimed');
+            
+            const status = card.querySelector('.reward-status');
+            status.textContent = 'ได้รับแล้ว';
+            status.className = 'reward-status status-claimed';
+            
+            button.textContent = 'ได้รับแล้ว ✓';
+            button.className = 'reward-btn claimed';
+            
+            showNotification('🎉 แลกรางวัลสำเร็จ! ขอให้เพลิดเพลินกับรางวัลนะ');
+
+            // Add animation
+            card.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                card.style.transform = 'scale(1)';
+            }, 200);
+        } else {
+            showNotification('❌ แต้มไม่เพียงพอสำหรับรางวัลนี้นะ', true);
+        }
+    }
+
+    updatePointsDisplay();
+</script>
+</body>
+</html>

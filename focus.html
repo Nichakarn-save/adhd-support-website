@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เกมฝึกสมาธิ - ADHD Support</title>
+    <link rel="manifest" href="manifest.json" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: fixed;
+            pointer-events: none;
+            font-size: 2em;
+            animation: float 6s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            background: #ff5252;
+            transform: translateY(-2px);
+        }
+
+        .page-title {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            flex: 1;
+        }
+
+        /* Game Container */
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        /* Game Stats */
+        .game-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        /* Game Area */
+        .game-area {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 20px;
+            margin: 30px 0;
+            overflow: hidden;
+            border: 3px solid #667eea;
+        }
+
+        .target {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ffa726 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        .target:hover {
+            transform: scale(1.1);
+        }
+
+        .target.clicked {
+            animation: explode 0.5s ease-out forwards;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes explode {
+            0% { 
+                transform: scale(1); 
+                opacity: 1; 
+            }
+            50% { 
+                transform: scale(1.5); 
+                opacity: 0.8; 
+            }
+            100% { 
+                transform: scale(0); 
+                opacity: 0; 
+            }
+        }
+
+        /* Game Controls */
+        .game-controls {
+            margin-bottom: 30px;
+        }
+
+        .game-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .game-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Difficulty Selection */
+        .difficulty-selector {
+            margin-bottom: 20px;
+        }
+
+        .difficulty-btn {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+            font-size: 1em;
+        }
+
+        .difficulty-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .difficulty-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Game Instructions */
+        .instructions {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border-left: 5px solid #2196f3;
+        }
+
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .instructions p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* Game Over Screen */
+        .game-over {
+            display: none;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .game-over h3 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .game-over p {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        /* Achievement Badges */
+        .achievements {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .achievement-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+            color: #333;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Timer Bar */
+        .timer-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .game-container {
+                padding: 20px;
+            }
+
+            .game-area {
+                height: 300px;
+            }
+
+            .game-stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .target {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2em;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bounce-in {
+            animation: bounceIn 0.8s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Combo Effect */
+        .combo-text {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 3em;
+            font-weight: bold;
+            color: #ff6b6b;
+            z-index: 1000;
+            pointer-events: none;
+            animation: comboEffect 1s ease-out forwards;
+        }
+
+        @keyframes comboEffect {
+            0% { 
+                transform: translate(-50%, -50%) scale(0.5); 
+                opacity: 0; 
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.2); 
+                opacity: 1; 
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1); 
+                opacity: 0; 
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Elements -->
+    <div class="floating-element" style="top: 10%; left: 5%;">🌟</div>
+    <div class="floating-element" style="top: 20%; right: 10%; animation-delay: -2s;">🎯</div>
+    <div class="floating-element" style="bottom: 20%; left: 15%; animation-delay: -4s;">⚡</div>
+    <div class="floating-element" style="bottom: 10%; right: 5%; animation-delay: -1s;">🚀</div>
+
+    <!-- Header -->
+    <div class="header fade-in">
+        <a href="activity.html" class="back-btn">← กลับหน้าหลัก</a>
+        <h1 class="page-title">🎯 เกมฝึกสมาธิ</h1>
+        <div></div>
+    </div>
+
+    <!-- Game Container -->
+    <div class="game-container bounce-in">
+        <!-- Instructions -->
+        <div class="instructions">
+            <h3>🎮 วิธีเล่น</h3>
+            <p>คลิกที่เป้าหมายที่ปรากฏขึ้นให้เร็วที่สุด! เมื่อคลิกถูกเป้าหมาย คะแนนจะเพิ่มขึ้น หากคลิกผิดจะหักคะแนน เกมจะท้าทายความเร็วและความแม่นยำของคุณ</p>
+        </div>
+
+        <!-- Difficulty Selection -->
+        <div class="difficulty-selector">
+            <h3 style="margin-bottom: 15px; color: #333;">เลือกระดับความยาก:</h3>
+            <button class="difficulty-btn active" onclick="setDifficulty('easy')">😊 ง่าย</button>
+            <button class="difficulty-btn" onclick="setDifficulty('medium')">😐 ปานกลาง</button>
+            <button class="difficulty-btn" onclick="setDifficulty('hard')">😤 ยาก</button>
+        </div>
+
+        <!-- Game Stats -->
+        <div class="game-stats">
+            <div class="stat-item">
+                <div class="stat-number" id="score">0</div>
+                <div class="stat-label">คะแนน</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="combo">0</div>
+                <div class="stat-label">คอมโบ</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="accuracy">100%</div>
+                <div class="stat-label">ความแม่นยำ</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="timeLeft">30</div>
+                <div class="stat-label">เวลา (วินาที)</div>
+            </div>
+        </div>
+
+        <!-- Timer Bar -->
+        <div class="timer-bar">
+            <div class="timer-fill" id="timerFill"></div>
+        </div>
+
+        <!-- Game Controls -->
+        <div class="game-controls">
+            <button class="game-btn" id="startBtn" onclick="startGame()">🎮 เริ่มเกม</button>
+            <button class="game-btn" id="pauseBtn" onclick="pauseGame()" disabled>⏸️ หยุดชั่วคราว</button>
+            <button class="game-btn" id="resetBtn" onclick="resetGame()">🔄 เริ่มใหม่</button>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-area" id="gameArea">
+            <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666; font-size: 1.2em;">
+                กดปุ่ม "เริ่มเกม" เพื่อเริ่มต้น
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div class="game-over" id="gameOver">
+            <h3>🎉 เกมจบแล้ว!</h3>
+            <p id="finalScore">คะแนนสุดท้าย: 0</p>
+            <p id="finalAccuracy">ความแม่นยำ: 100%</p>
+            <div class="achievements" id="achievements"></div>
+            <button class="game-btn" onclick="playAgain()">🎮 เล่นอีกครั้ง</button>
+        </div>
+    </div>
+
+    <script>
+        let gameState = {
+            isPlaying: false,
+            isPaused: false,
+            score: 0,
+            combo: 0,
+            hits: 0,
+            misses: 0,
+            timeLeft: 30,
+            difficulty: 'easy',
+            gameTimer: null,
+            spawnTimer: null,
+            targets: []
+        };
+
+        const difficulties = {
+            easy: { spawnRate: 1500, targetLife: 3000, targetSize: 60 },
+            medium: { spawnRate: 1000, targetLife: 2000, targetSize: 50 },
+            hard: { spawnRate: 700, targetLife: 1500, targetSize: 40 }
+        };
+
+        function setDifficulty(level) {
+            if (gameState.isPlaying) return;
+            
+            gameState.difficulty = level;
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function startGame() {
+            gameState.isPlaying = true;
+            gameState.isPaused = false;
+            gameState.score = 0;
+            gameState.combo = 0;
+            gameState.hits = 0;
+            gameState.misses = 0;
+            gameState.timeLeft = 30;
+            gameState.targets = [];
+
+            updateUI();
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('pauseBtn').disabled = false;
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('gameArea').innerHTML = '';
+
+            // Start timers
+            gameState.gameTimer = setInterval(updateTimer, 1000);
+            gameState.spawnTimer = setInterval(spawnTarget, difficulties[gameState.difficulty].spawnRate);
+
+            // Add click listener to game area for misses
+            document.getElementById('gameArea').addEventListener('click', handleMiss);
+        }
+
+        function pauseGame() {
+            if (!gameState.isPlaying) return;
+
+            gameState.isPaused = !gameState.isPaused;
+            const pauseBtn = document.getElementById('pauseBtn');
+
+            if (gameState.isPaused) {
+                clearInterval(gameState.gameTimer);
+                clearInterval(gameState.spawnTimer);
+                pauseBtn.textContent = '▶️ ต่อเกม';
+                
+                // Pause all targets
+                gameState.targets.forEach(target => {
+                    if (target.timer) {
+                        clearTimeout(target.timer);
+                    }
+                });
+            } else {
+                gameState.gameTimer = setInterval(updateTimer, 1000);
+                gameState.spawnTimer = setInterval(spawnTarget, difficulties[gameState.difficulty].spawnRate);
+                pauseBtn.textContent = '⏸️ หยุดชั่วคราว';
+                
+                // Resume targets
+                gameState.targets.forEach(target => {
+                    if (target.element && target.element.parentNode) {
+                        target.timer = setTimeout(() => {
+                            removeTarget(target);
+                        }, target.remainingTime);
+                    }
+                });
+            }
+        }
+
+        function resetGame() {
+            endGame();
+            gameState.score = 0;
+            gameState.combo = 0;
+            gameState.hits = 0;
+            gameState.misses = 0;
+            gameState.timeLeft = 30;
+            updateUI();
+            document.getElementById('gameOver').style.display = 'none';
+            document.getElementById('gameArea').innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666; font-size: 1.2em;">กดปุ่ม "เริ่มเกม" เพื่อเริ่มต้น</div>';
+        }
+
+        function endGame() {
+            gameState.isPlaying = false;
+            gameState.isPaused = false;
+            
+            clearInterval(gameState.gameTimer);
+            clearInterval(gameState.spawnTimer);
+            
+            // Clear all targets
+            gameState.targets.forEach(target => {
+                if (target.timer) clearTimeout(target.timer);
+                if (target.element && target.element.parentNode) {
+                    target.element.parentNode.removeChild(target.element);
+                }
+            });
+            gameState.targets = [];
+
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('pauseBtn').disabled = true;
+            document.getElementById('pauseBtn').textContent = '⏸️ หยุดชั่วคราว';
+            
+            showGameOverScreen();
+        }
+
+        function updateTimer() {
+            gameState.timeLeft--;
+            updateUI();
+
+            if (gameState.timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        function spawnTarget() {
+            if (gameState.isPaused) return;
+
+            const gameArea = document.getElementById('gameArea');
+            const target = document.createElement('div');
+            target.className = 'target';
+            target.textContent = '🎯';
+
+            // Random position within game area
+            const maxX = gameArea.clientWidth - difficulties[gameState.difficulty].targetSize;
+            const maxY = gameArea.clientHeight - difficulties[gameState.difficulty].targetSize;
+            const x = Math.random() * maxX;
+            const y = Math.random() * maxY;
+
+            target.style.left = x + 'px';
+            target.style.top = y + 'px';
+            target.style.width = difficulties[gameState.difficulty].targetSize + 'px';
+            target.style.height = difficulties[gameState.difficulty].targetSize + 'px';
+
+            gameArea.appendChild(target);
+
+            const targetObj = {
+                element: target,
+                timer: setTimeout(() => {
+                    removeTarget(targetObj);
+                }, difficulties[gameState.difficulty].targetLife),
+                remainingTime: difficulties[gameState.difficulty].targetLife
+            };
+
+            gameState.targets.push(targetObj);
+
+            // Add click event
+            target.addEventListener('click', (e) => {
+                e.stopPropagation();
+                hitTarget(targetObj);
+            });
+        }
+
+        function hitTarget(targetObj) {
+            if (!gameState.isPlaying || gameState.isPaused) return;
+
+            // Visual feedback
+            targetObj.element.classList.add('clicked');
+            
+            // Remove target
+            clearTimeout(targetObj.timer);
+            setTimeout(() => {
+                if (targetObj.element.parentNode) {
+                    targetObj.element.parentNode.removeChild(targetObj.element);
+                }
+            }, 500);
+
+            // Update score
+            gameState.hits++;
+            gameState.combo++;
+            let points = 10;
+            
+            // Combo bonus
+            if (gameState.combo >= 5) {
+                points += Math.floor(gameState.combo / 5) * 5;
+                showComboEffect();
+            }
+            
+            gameState.score += points;
+
+            // Remove from targets array
+            const index = gameState.targets.indexOf(targetObj);
+            if (index > -1) {
+                gameState.targets.splice(index, 1);
+            }
+
+            updateUI();
+        }
+
+        function removeTarget(targetObj) {
+            if (targetObj.element && targetObj.element.parentNode) {
+                targetObj.element.parentNode.removeChild(targetObj.element);
+            }
+            
+            const index = gameState.targets.indexOf(targetObj);
+            if (index > -1) {
+                gameState.targets.splice(index, 1);
+            }
+        }
+
+        function handleMiss(e) {
+            if (!gameState.isPlaying || gameState.isPaused) return;
+            if (e.target.classList.contains('target')) return;
+
+            gameState.misses++;
+            gameState.combo = 0;
+            gameState.score = Math.max(0, gameState.score - 5);
+            updateUI();
+        }
+
+        function showComboEffect() {
+            const comboText = document.createElement('div');
+            comboText.className = 'combo-text';
+            comboText.textContent = `COMBO x${gameState.combo}!`;
+            document.body.appendChild(comboText);
+
+            setTimeout(() => {
+                if (comboText.parentNode) {
+                    comboText.parentNode.removeChild(comboText);
+                }
+            }, 1000);
+        }
+
+        function updateUI() {
+            document.getElementById('score').textContent = gameState.score;
+            document.getElementById('combo').textContent = gameState.combo;
+            document.getElementById('timeLeft').textContent = gameState.timeLeft;
+            
+            const totalShots = gameState.hits + gameState.misses;
+            const accuracy = totalShots > 0 ? Math.round((gameState.hits / totalShots) * 100) : 100;
+            document.getElementById('accuracy').textContent = accuracy + '%';
+
+            // Update timer bar
+            const timerFill = document.getElementById('timerFill');
+            const percentage = (gameState.timeLeft / 30) * 100;
+            timerFill.style.width = percentage + '%';
+            
+            // Change color based on time left
+            if (gameState.timeLeft <= 10) {
+                timerFill.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%)';
+            } else if (gameState.timeLeft <= 20) {
+                timerFill.style.background = 'linear-gradient(135deg, #ffa726 0%, #ffcc02 100%)';
+            } else {
+                timerFill.style.background = 'linear-gradient(135deg, #4caf50 0%, #8bc34a 100%)';
+            }
+        }
+
+        function showGameOverScreen() {
+            const totalShots = gameState.hits + gameState.misses;
+            const accuracy = totalShots > 0 ? Math.round((gameState.hits / totalShots) * 100) : 100;
+            
+            document.getElementById('finalScore').textContent = `คะแนนสุดท้าย: ${gameState.score}`;
+            document.getElementById('finalAccuracy').textContent = `ความแม่นยำ: ${accuracy}%`;
+            
+            // Show achievements
+            const achievementsDiv = document.getElementById('achievements');
+            achievementsDiv.innerHTML = '';
+            
+            const achievements = [];
+            if (gameState.score >= 100) achievements.push('🏆 คะแนนสูง');
+            if (accuracy >= 90) achievements.push('🎯 แม่นยำ');
+            if (gameState.combo >= 10) achievements.push('🔥 คอมโบสูง');
+            if (gameState.hits >= 20) achievements.push('⚡ ปืนไว');
+            
+            achievements.forEach(achievement => {
+                const badge = document.createElement('span');
+                badge.className = 'achievement-badge';
+                badge.textContent = achievement;
+                achievementsDiv.appendChild(badge);
+            });
+            
+            document.getElementById('gameOver').style.display = 'block';
+        }
+
+        function playAgain() {
+            resetGame();
+            startGame();
+        }
+
+        // Initialize UI
+        updateUI();
+    </script>
+</body>
+</html>
