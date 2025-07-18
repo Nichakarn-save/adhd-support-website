@@ -525,10 +525,12 @@
     <script>
        const savedUser = localStorage.getItem('adhdUser');
         if (!savedUser) {
-        window.location.href = "login.html"; 
+        window.location.href = "index.html"; 
         }     
 
-        
+        if (user.type === "parent") {
+        window.location.href = "parent.html";
+        }
         let currentUser = {
             name: "ผู้ใช้",
             type: "child",
@@ -592,7 +594,7 @@
         function logout() {
         if (confirm('คุณแน่ใจหรือไม่ที่จะออกจากระบบ?')) {
         localStorage.removeItem('adhdUser');
-        window.location.href = 'login.html';
+        window.location.href = 'index.html';
         }
         }
 

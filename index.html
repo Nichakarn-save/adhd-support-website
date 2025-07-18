@@ -803,9 +803,8 @@
     window.location.href = "activity.html";
     }
     function logout() {
-        currentUser = null;
-        document.getElementById("mainContent").style.display = "none";
-        document.getElementById("loginScreen").style.display = "flex";
+      localStorage.clear();
+      window.location.href = "index.html"; // หรือ index.html ถ้าหน้า login ชื่อใหม่
     }
 
     function selectUserType(type, event) {
