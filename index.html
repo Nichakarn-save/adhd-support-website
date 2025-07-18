@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADHD Support - เว็บไซต์สนับสนุนเด็ก ADHD</title>
-    <link rel="manifest" href="manifest.json" />
     <style>
         * {
             margin: 0;
@@ -604,7 +603,7 @@
         <div class="login-container bounce-in">
             <h1>🧠 ADHD Support</h1>
             <p>เว็บไซต์สนับสนุนเด็ก ADHD<br>พัฒนาทักษะและความสามารถ</p>
-            
+            <button class="login-btn" onclick="showLogin()">🔐 เข้าสู่ระบบ</button>
             <button class="login-btn" onclick="demoLogin()">🎮 ทดลองใช้</button>
         </div>
     </div>
@@ -749,6 +748,9 @@
     </div>
 
    <script>
+    let userType = "child"; 
+    let registerType = "child"; 
+
     function showLogin() {
         document.getElementById("loginModal").style.display = "block";
     }
@@ -801,8 +803,9 @@
     window.location.href = "activity.html";
     }
     function logout() {
-    localStorage.removeItem("adhdUser");
-    window.location.href = "./"; 
+        currentUser = null;
+        document.getElementById("mainContent").style.display = "none";
+        document.getElementById("loginScreen").style.display = "flex";
     }
 
     function selectUserType(type, event) {
@@ -853,14 +856,6 @@
     function closeActivity() {
         document.getElementById("activityModal").style.display = "none";
     }
-
-    if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(reg => console.log('✅ Service Worker registered', reg))
-        .catch(err => console.log('❌ Service Worker registration failed', err));
-    });
-  }
 </script>
 
 </body>
