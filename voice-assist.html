@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ตัวช่วยอ่านเสียง - ADHD Support</title>
+
+    <body>
+    <!-- Floating Elements -->
+    <div class="floating-element" style="top: 10%; left: 5%;">🔊</div>
+    <div class="floating-element" style="top: 20%; right: 10%; animation-delay: -2s;">📚</div>
+    <div class="floating-element" style="bottom: 10%; right: 5%; animation-delay: -1s;">✨</div>
+
+    <!-- Status Indicator -->
+    <div class="status-indicator" id="statusIndicator">
+        <span id="statusIcon">🔊</span>
+        <span id="statusText">กำลังอ่าน...</span>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🔊 ตัวช่วยอ่านเสียง</h1>
+            <a href="activity.html" class="back-btn">
+                ⬅️ กลับหน้าหลัก
+            </a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-grid">
+            <!-- Speech Practice Section -->
+            <div class="card">
+                <h2>🗣️ ฝึกพูดด้วยตนเอง</h2>
+                <div class="feature-description">
+                    ฟังคำพูดตัวอย่าง จากนั้นให้เด็กลองพูดตาม พร้อมฝึกการเปล่งเสียงและประเมินความถูกต้อง
+                </div>
+                
+                <div class="practice-section">
+                    <div class="practice-controls">
+                        <select id="practiceSelect" style="padding: 12px; font-size: 1em; border-radius: 10px; border: 2px solid #ddd;">
+                            <option value="สวัสดีครับ">สวัสดีครับ</option>
+                            <option value="สวัสดีค่ะ">สวัสดีค่ะ</option>
+                            <option value="ขอบคุณมากครับ">ขอบคุณมากครับ</option>
+                            <option value="ขอบคุณมากค่ะ">ขอบคุณมากค่ะ</option>
+                            <option value="วันนี้อากาศดีจังเลย">วันนี้อากาศดีจังเลย</option>
+                            <option value="ฉันชอบกินข้าวผัด">ฉันชอบกินข้าวผัด</option>
+                            <option value="แมวของฉันชื่อมิมิ">แมวของฉันชื่อมิมิ</option>
+                            <option value="หนูชื่ออะไรครับ">หนูชื่ออะไรครับ</option>
+                            <option value="หนูชื่ออะไรค่ะ">หนูชื่ออะไรค่ะ</option>
+                            <option value="ช่วยเหลือกันและกันเถอะ">ช่วยเหลือกันและกันเถอะ</option>
+                        </select>
+                        <button onclick="playPracticeExample()" class="control-btn" style="min-height: 50px;">
+                            🔊 ฟังตัวอย่าง
+                        </button>
+                    </div>
+
+                    <div class="control-section" style="margin-bottom: 0;">
+                        <button onclick="startSpeechRecognition()" class="control-btn" id="recordBtn">
+                            🎤 เริ่มบันทึกเสียง
+                        </button>
+                        <button onclick="stopSpeechRecognition()" class="control-btn stop" id="stopRecordBtn" disabled>
+                            ⏹️ หยุดบันทึก
+                        </button>
+                    </div>
+
+                    <div class="recording-status" id="recordingStatus">
+                        <strong>สถานะ:</strong> <span id="statusMessage">พร้อมใช้งาน</span>
+                    </div>
+
+                    <div id="recognitionResult" style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; margin: 10px 0; min-height: 50px;">
+                        <strong>ผลการจดจำเสียง:</strong> <span id="recognizedText" style="color: #333;">-</span>
+                    </div>
+
+                    <div class="score-display" id="scoreDisplay" style="display: none;">
+                        <div class="score-stars" id="scoreStars"></div>
+                        <div id="scoreText" style="font-weight: bold; font-size: 1.2em;"></div>
+                        <div id="feedbackText" style="margin-top: 10px; color: #555;"></div>
+                    </div>
+                </div>
+
+                <!-- Custom Practice Input -->
+                <div style="margin-top: 20px;">
+                    <h3 style="color: #333; margin-bottom: 10px;">📝 สร้างประโยคฝึกพูดเอง:</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="customPracticeText" placeholder="พิมพ์ประโยคที่ต้องการฝึก..." 
+                               style="flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 1em;">
+                        <button onclick="setCustomPractice()" class="control-btn" style="min-height: auto; padding: 12px 20px;">
+                            ✅ ตั้งค่า
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Text to Speech Section -->
+            <div class="card">
+                <h2>📖 พิมพ์และฟังเสียง</h2>
+                
+                <div class="text-input-section">
+                    <textarea 
+                        class="text-area" 
+                        id="textInput" 
+                        placeholder="พิมพ์เนื้อหาที่ต้องการฟังที่นี่... เช่น บทเรียน เรื่องสั้น หรือข้อความใดๆ ที่ต้องการให้อ่านให้ฟัง"
+                    ></textarea>
+                </div>
+
+                <div class="control-section">
+                    <button class="control-btn" onclick="speakText()" id="speakBtn">
+                        🔊 อ่านให้ฟัง
+                    </button>
+                    <button class="control-btn stop" onclick="stopSpeaking()" id="stopBtn">
+                        ⏹️ หยุดอ่าน
+                    </button>
+                    <button class="control-btn" onclick="pauseResume()" id="pauseBtn">
+                        ⏸️ หยุดชั่วคราว
+                    </button>
+                </div>
+
+                <!-- Auto Read Toggle -->
+                <div class="toggle-container">
+                    <div class="toggle-switch" id="autoReadToggle" onclick="toggleAutoRead()">
+                        <div class="toggle-slider"></div>
+                    </div>
+                    <span class="toggle-label">อ่านอัตโนมัติเมื่อพิมพ์</span>
+                </div>
+
+                <!-- Sample Texts -->
+                <div class="sample-texts">
+                    <h3 style="color: #333; margin-bottom: 10px;">📝 ตัวอย่างข้อความ:</h3>
+                    <button class="sample-btn" onclick="loadSampleText('story')">📚 เรื่องสั้น</button>
+                    <button class="sample-btn" onclick="loadSampleText('lesson')">📖 บทเรียน</button>
+                    <button class="sample-btn" onclick="loadSampleText('instructions')">📋 คำแนะนำ</button>
+                    <button class="sample-btn" onclick="loadSampleText('poem')">🎵 บทกวี</button>
+                </div>
+            </div>
+
+            <!-- Feature Description -->
+            <div class="card">
+                <h2>✨ เกี่ยวกับตัวช่วยอ่านเสียง</h2>
+                
+                <div class="feature-description">
+                    ตัวช่วยอ่านเสียงนี้ออกแบบมาเพื่อช่วยเหลือเด็ก ADHD ในการเรียนรู้และเข้าใจเนื้อหาได้ดีขึ้น
+                </div>
+
+                <ul class="feature-list">
+                    <li>ช่วยเด็กที่มีปัญหาการอ่านหรือสมาธิสั้น</li>
+                    <li>สนับสนุนการเรียนรู้ผ่านการฟัง</li>
+                    <li>ฝึกการพูดและการออกเสียง</li>
+                    <li>ประเมินความถูกต้องของการพูด</li>
+                    <li>ลดความเครียดจากการอ่านเอง</li>
+                    <li>เพิ่มความเข้าใจในเนื้อหา</li>
+                    <li>สามารถควบคุมความเร็วและเสียงได้</li>
+                </ul>
+
+                <!-- Voice Settings -->
+                <div class="voice-settings">
+                    <div class="setting-group">
+                        <label for="voiceSelect">🎭 เลือกเสียง:</label>
+                        <select id="voiceSelect" onchange="updateVoice()">
+                            <option value="0">เสียงผู้หญิง (ไทย)</option>
+                            <option value="1">เสียงผู้ชาย (ไทย)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="setting-group">
+                        <label for="speedSelect">⚡ ความเร็ว:</label>
+                        <select id="speedSelect" onchange="updateSpeed()">
+                            <option value="0.7">ช้า</option>
+                            <option value="1" selected>ปกติ</option>
+                            <option value="1.3">เร็ว</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics and Progress -->
+            <div class="card">
+                <h2>📊 สถิติการฝึกพูด</h2>
+                <div class="feature-description">
+                    ติดตามความก้าวหน้าในการฝึกพูดของเด็ก
+                </div>
+                
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-title">🎯 จำนวนครั้งที่ฝึก</div>
+                        <div class="tip-content">
+                            <span id="practiceCount" style="font-size: 2em; font-weight: bold; color: #667eea;">0</span> ครั้ง
+                        </div>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <div class="tip-title">⭐ คะแนนเฉลี่ย</div>
+                        <div class="tip-content">
+                            <span id="averageScore" style="font-size: 2em; font-weight: bold; color: #28a745;">0</span>%
+                        </div>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <div class="tip-title">🏆 ประโยคที่ชำนาญ</div>
+                        <div class="tip-content">
+                            <span id="masteredSentences" style="font-size: 2em; font-weight: bold; color: #ffa500;">0</span> ประโยค
+                        </div>
+                    </div>
+                    
+                    <div class="tip-card">
+                        <div class="tip-title">🎪 รางวัลที่ได้รับ</div>
+                        <div class="tip-content" id="achievements">
+                            ยังไม่มีรางวัล - เริ่มฝึกพูดเลย!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parent Tips -->
+        <div class="card parent-tips">
+            <h2>👨‍👩‍👧‍👦 คำแนะนำสำหรับผู้ปกครอง</h2>
+            
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-title">🎯 การใช้งานที่มีประสิทธิภาพ</div>
+                    <div class="tip-content">
+                        เริ่มต้นด้วยข้อความสั้นๆ และค่อยๆ เพิ่มความยาว ให้เด็กนั่งในที่เงียบและมีสมาธิ
+                    </div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-title">🗣️ การฝึกพูด</div>
+                    <div class="tip-content">
+                        ให้เด็กฟังตัวอย่างก่อน แล้วค่อยให้พูดตาม อย่าเร่งรีบ ให้เวลาเด็กในการเรียนรู้
+                    </div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-title">👂 การฟังอย่างมีสมาธิ</div>
+                    <div class="tip-content">
+                        สนับสนุนให้เด็กฟังพร้อมกับอ่านตาม เพื่อพัฒนาทักษะการอ่านและความเข้าใจ
+                    </div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-title">⏰ การจัดเวลา</div>
+                    <div class="tip-content">
+                        ใช้เป็นช่วงสั้นๆ 10-15 นาทีต่อครั้ง หลีกเลี่ยงการใช้นานเกินไป
+                    </div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-title">🎨 การทำให้น่าสนใจ</div>
+                    <div class="tip-content">
+                        หาเนื้อหาที่เด็กสนใจ เช่น เรื่องสั้น การ์ตูน หรือหนังสือที่
+                    </div>
+    
+
+
+
+<p id="recognizedText" class="recognized-text"></p>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 2.2em;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Feature Description */
+        .feature-description {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 15px;
+            color: #333;
+            font-weight: 500;
+            position: relative;
+            animation: slideInRight 0.8s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .feature-list li::before {
+            content: '✨';
+            margin-right: 10px;
+        }
+
+        /* Speech Practice Section */
+        .practice-section {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .practice-controls {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .recording-status {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #667eea;
+        }
+
+        .recording-status.listening {
+            background: rgba(40, 167, 69, 0.1);
+            border-left-color: #28a745;
+            animation: pulse 2s infinite;
+        }
+
+        .recording-status.error {
+            background: rgba(220, 53, 69, 0.1);
+            border-left-color: #dc3545;
+        }
+
+        .score-display {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .score-stars {
+            font-size: 2em;
+            margin: 10px 0;
+        }
+
+        /* Text Area Section */
+        .text-input-section {
+            margin-bottom: 25px;
+        }
+
+        .text-area {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            font-size: 1.1em;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .text-area:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .text-area::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+
+        /* Control Buttons */
+        .control-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 20px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+            min-height: 60px;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .control-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .control-btn.active {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        }
+
+        .control-btn.stop {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        .control-btn.recording {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            animation: recordPulse 1.5s infinite;
+        }
+
+        @keyframes recordPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Voice Settings */
+        .voice-settings {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .setting-group {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .setting-group label {
+            display: block;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .setting-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1em;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .setting-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #e9ecef;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #ccc;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(30px);
+        }
+
+        .toggle-label {
+            color: #333;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        /* Parent Tips */
+        .parent-tips {
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        .tips-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .tip-card {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .tip-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .tip-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .tip-content {
+            color: #555;
+            line-height: 1.5;
+        }
+
+        /* Status Indicator */
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 25px;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .status-indicator.show {
+            display: flex;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Sample Texts */
+        .sample-texts {
+            margin-top: 20px;
+        }
+
+        .sample-btn {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 10px 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .sample-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .control-section {
+                grid-template-columns: 1fr;
+            }
+
+            .voice-settings {
+                grid-template-columns: 1fr;
+            }
+
+            .practice-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: fixed;
+            pointer-events: none;
+            font-size: 2em;
+            animation: float 6s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+    </style>
+
+    <script>
+  function playPractice() {
+    const sentence = document.getElementById("practiceSelect").value;
+    const msg = new SpeechSynthesisUtterance(sentence);
+    msg.lang = 'th-TH';
+    window.speechSynthesis.speak(msg);
+  }
+
+  function startRecognition() {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'th-TH';
+
+    recognition.onresult = function(event) {
+      const spoken = event.results[0][0].transcript;
+      document.getElementById("recognizedText").innerText = "🗣️ คุณพูดว่า: " + spoken;
+    };
+
+    recognition.onerror = function(event) {
+      document.getElementById("recognizedText").innerText = "⚠️ เกิดข้อผิดพลาด: " + event.error;
+    };
+
+    recognition.start();
+  }
+</script>
+
+<script>
+  let recognition;
+  let customSentence = "";
+
+  function playPracticeExample() {
+    const selected = document.getElementById("practiceSelect").value;
+    const utterance = new SpeechSynthesisUtterance(selected);
+    utterance.lang = 'th-TH';
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function setCustomPractice() {
+    const input = document.getElementById("customPracticeText").value.trim();
+    if (input) {
+      const select = document.getElementById("practiceSelect");
+      const option = new Option(input, input);
+      select.add(option);
+      select.value = input;
+      customSentence = input;
+    }
+  }
+
+  function startSpeechRecognition() {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+      alert("เบราว์เซอร์ของคุณไม่รองรับการรู้จำเสียง");
+      return;
+    }
+
+    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'th-TH';
+    recognition.interimResults = false;
+
+    document.getElementById("statusMessage").innerText = "กำลังบันทึกเสียง...";
+    document.getElementById("recordBtn").disabled = true;
+    document.getElementById("stopRecordBtn").disabled = false;
+
+    recognition.onresult = function(event) {
+      const result = event.results[0][0].transcript.trim();
+      document.getElementById("recognizedText").innerText = result;
+
+      const expected = document.getElementById("practiceSelect").value.trim();
+      scoreSpeech(result, expected);
+    };
+
+    recognition.onerror = function(event) {
+      document.getElementById("recognizedText").innerText = "⚠️ ข้อผิดพลาด: " + event.error;
+    };
+
+    recognition.onend = function() {
+      document.getElementById("statusMessage").innerText = "พร้อมใช้งาน";
+      document.getElementById("recordBtn").disabled = false;
+      document.getElementById("stopRecordBtn").disabled = true;
+    };
+
+    recognition.start();
+  }
+
+  function stopSpeechRecognition() {
+    if (recognition) {
+      recognition.stop();
+    }
+  }
+
+  function scoreSpeech(spoken, expected) {
+    const scoreDisplay = document.getElementById("scoreDisplay");
+    const scoreStars = document.getElementById("scoreStars");
+    const scoreText = document.getElementById("scoreText");
+    const feedbackText = document.getElementById("feedbackText");
+
+    let score = 0;
+
+    if (spoken === expected) {
+      score = 5;
+    } else if (spoken.includes(expected)) {
+      score = 4;
+    } else if (expected.includes(spoken)) {
+      score = 3;
+    } else if (spoken.length > 0) {
+      score = 2;
+    }
+
+    const stars = "⭐".repeat(score) + "☆".repeat(5 - score);
+    let feedback = "";
+
+    if (score === 5) {
+      feedback = "เยี่ยมมาก! พูดได้ชัดเจนและตรงเป๊ะ";
+    } else if (score >= 3) {
+      feedback = "ทำได้ดี! มีบางคำที่คลาดเคลื่อนนิดหน่อย";
+    } else {
+      feedback = "ลองใหม่อีกครั้งนะ ไม่เป็นไร";
+    }
+
+    scoreStars.innerText = stars;
+    scoreText.innerText = `คะแนน: ${score}/5`;
+    feedbackText.innerText = feedback;
+
+    scoreDisplay.style.display = "block";
+  }
+</script>
+
+<script>
+let synth = window.speechSynthesis;
+let utterance = null;
+let isPaused = false;
+let autoReadEnabled = false;
+
+function speakText() {
+  const text = document.getElementById("textInput").value.trim();
+  if (!text) return;
+
+  stopSpeaking(); // หยุดก่อนเริ่มใหม่
+  utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "th-TH";
+  synth.speak(utterance);
+}
+
+function stopSpeaking() {
+  if (synth.speaking || synth.paused) {
+    synth.cancel();
+    isPaused = false;
+  }
+}
+
+function pauseResume() {
+  if (!synth.speaking) return;
+
+  if (synth.paused) {
+    synth.resume();
+    isPaused = false;
+    document.getElementById("pauseBtn").innerText = "⏸️ หยุดชั่วคราว";
+  } else {
+    synth.pause();
+    isPaused = true;
+    document.getElementById("pauseBtn").innerText = "▶️ ต่อ";
+  }
+}
+
+function toggleAutoRead() {
+  autoReadEnabled = !autoReadEnabled;
+  const toggle = document.getElementById("autoReadToggle");
+  toggle.classList.toggle("active");
+}
+
+document.getElementById("textInput").addEventListener("input", function () {
+  if (autoReadEnabled) {
+    speakText();
+  }
+});
+
+function loadSampleText(type) {
+  const textBox = document.getElementById("textInput");
+  let text = "";
+  if (type === "story") {
+    text = "กาลครั้งหนึ่งนานมาแล้ว เด็กชายคนหนึ่งอาศัยอยู่ในหมู่บ้านเล็กๆ...";
+  } else if (type === "lesson") {
+    text = "วันนี้เราจะมาเรียนรู้เรื่องผลบวกของตัวเลขในคณิตศาสตร์กันค่ะ...";
+  } else if (type === "instructions") {
+    text = "กรุณานั่งให้ตรง สูดหายใจลึกๆ แล้วเริ่มต้นทำกิจกรรมช้าๆ...";
+  } else if (type === "poem") {
+    text = "แสงแดดอ่อนยามเช้า ดอกไม้บานไสว กลิ่นหอมโชยมาไกล ใจเราสดใสเอย...";
+  }
+  textBox.value = text;
+  if (autoReadEnabled) {
+    speakText();
+  }
+}
+</script>
+
+</body>
+</html>
