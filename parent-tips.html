@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADHD Support - เคล็ดลับสำหรับผู้ปกครอง</title>
+    <link rel="manifest" href="manifest.json" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Floating Elements */
+        .floating-element {
+            position: fixed;
+            pointer-events: none;
+            font-size: 2em;
+            animation: float 6s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .site-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .back-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        /* Page Title */
+        .page-title {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .page-title h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .page-title p {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Tips Categories */
+        .categories-nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .category-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .category-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .category-btn.active {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        /* Tips Container */
+        .tips-container {
+            display: grid;
+            gap: 30px;
+        }
+
+        .tip-category {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .tip-category.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .category-icon {
+            font-size: 3em;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .category-title {
+            font-size: 2em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .tip-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tip-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .tip-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50px;
+            height: 50px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 0 0 0 100%;
+            transition: all 0.3s ease;
+        }
+
+        .tip-card:hover::before {
+            width: 100px;
+            height: 100px;
+        }
+
+        .tip-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .tip-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .tip-content {
+            color: #555;
+            line-height: 1.7;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+
+        .tip-example {
+            background: rgba(40, 167, 69, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 3px solid #28a745;
+            font-style: italic;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .tip-example::before {
+            content: "💡 ตัวอย่าง: ";
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        /* Emergency Tips */
+        .emergency-section {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .emergency-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .emergency-title {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .emergency-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .emergency-tip {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .emergency-tip h4 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Resource Links */
+        .resources-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 20px;
+            margin-top: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .resources-title {
+            font-size: 1.8em;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .resource-item {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .resource-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .resource-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .resource-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .resource-desc {
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header-left {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .site-title {
+                font-size: 1.5em;
+            }
+
+            .page-title h1 {
+                font-size: 2em;
+                flex-direction: column;
+            }
+
+            .category-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .category-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .resources-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .emergency-content {
+                grid-template-columns: 1fr;
+            }
+
+            body {
+                padding: 10px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0; 
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Elements -->
+    <div class="floating-element" style="top: 10%; left: 5%;">👨‍👩‍👧‍👦</div>
+    <div class="floating-element" style="top: 20%; right: 10%; animation-delay: -2s;">💝</div>
+    <div class="floating-element" style="bottom: 10%; right: 5%; animation-delay: -1s;">🌟</div>
+    <div class="floating-element" style="top: 50%; left: 2%; animation-delay: -3s;">📚</div>
+    <div class="floating-element" style="top: 60%; right: 3%; animation-delay: -5s;">💡</div>
+
+    <!-- Header -->
+    <div class="header loading">
+        <div class="header-left">
+            <div class="logo">👨‍👩‍👧‍👦</div>
+            <div class="site-title">เคล็ดลับสำหรับผู้ปกครอง</div>
+        </div>
+        <a href="activity.html" class="back-btn">
+            <span>←</span>
+            <span>กลับสู่หน้าหลัก</span>
+        </a>
+    </div>
+
+    <!-- Page Title -->
+    <div class="page-title loading" style="animation-delay: 0.2s;">
+        <h1>
+            <span>🧠</span>
+            <span>คู่มือผู้ปกครองเด็ก ADHD</span>
+            <span>💙</span>
+        </h1>
+        <p>แนวทางและเทคนิคในการสนับสนุนลูกน้อยให้พัฒนาเต็มศักยภาพ พร้อมสร้างสมดุลในครอบครัว</p>
+    </div>
+
+    <!-- Categories Navigation -->
+    <div class="categories-nav loading" style="animation-delay: 0.4s;">
+        <div class="category-buttons">
+            <button class="category-btn active" onclick="showCategory('daily-life')">ชีวิตประจำวัน</button>
+            <button class="category-btn" onclick="showCategory('learning')">การเรียนรู้</button>
+            <button class="category-btn" onclick="showCategory('behavior')">พฤติกรรม</button>
+            <button class="category-btn" onclick="showCategory('emotional')">อารมณ์</button>
+            <button class="category-btn" onclick="showCategory('communication')">การสื่อสาร</button>
+            <button class="category-btn" onclick="showCategory('school')">โรงเรียน</button>
+        </div>
+    </div>
+
+    <!-- Tips Container -->
+    <div class="tips-container">
+        <!-- Daily Life Tips -->
+        <div id="daily-life" class="tip-category active loading" style="animation-delay: 0.6s;">
+            <div class="category-header">
+                <span class="category-icon">🏠</span>
+                <h2 class="category-title">การจัดการชีวิตประจำวัน</h2>
+            </div>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-number">1</div>
+                    <h3 class="tip-title">สร้างกิจวัตรที่ชัดเจน</h3>
+                    <p class="tip-content">จัดทำตารางเวลาประจำวันที่เหมือนเดิมทุกวัน ช่วยให้เด็กรู้สึกปลอดภัยและลดความวิตกกังวล</p>
+                    <div class="tip-example">ตั้งเวลาตื่นนอน อาบน้ำ กินข้าว และนอนเป็นเวลาเดิมทุกวัน</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">2</div>
+                    <h3 class="tip-title">แบ่งงานเป็นขั้นตอนเล็กๆ</h3>
+                    <p class="tip-content">ภารกิจใหญ่ควรแยกเป็นงานย่อยที่ทำได้ง่าย เพื่อลดความรู้สึกท่วมท้นของเด็ก</p>
+                    <div class="tip-example">แทนที่จะบอก "เก็บของเล่น" ให้บอก "เก็บตุ๊กตาใส่กล่องก่อน แล้วค่อยเก็บหนังสือ"</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">3</div>
+                    <h3 class="tip-title">ใช้การแสดงภาพและสัญญาณ</h3>
+                    <p class="tip-content">ภาพและสัญญาณจะช่วยให้เด็กจำและทำตามคำสั่งได้ดีกว่าคำพูดเพียงอย่างเดียว</p>
+                    <div class="tip-example">ติดรูปภาพขั้นตอนการแปรงฟันไว้ในห้องน้ำ</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">4</div>
+                    <h3 class="tip-title">จัดสภาพแวดล้อมให้เรียบง่าย</h3>
+                    <p class="tip-content">ลดสิ่งรบกวนในบ้าน เช่น เสียงดัง แสงจ้า หรือของเล่นมากเกินไป</p>
+                    <div class="tip-example">จัดมุมเงียบสำหรับอ่านหนังสือหรือทำการบ้าน</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">5</div>
+                    <h3 class="tip-title">ให้เวลาเตรียมตัวเพิ่มเติม</h3>
+                    <p class="tip-content">เด็ก ADHD ต้องการเวลาในการปรับตัวมากกว่าเด็กทั่วไป</p>
+                    <div class="tip-example">แจ้งล่วงหน้า 10-15 นาทีก่อนเปลี่ยนกิจกรรม</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">6</div>
+                    <h3 class="tip-title">สร้างระบบรางวัล</h3>
+                    <p class="tip-content">ใช้การให้รางวัลเชิงบวกเพื่อเสริมพฤติกรรมที่ดี</p>
+                    <div class="tip-example">ใช้ตารางดาวหรือแต้มสะสม เมื่อครบจำนวนได้รับสิ่งที่ชอบ</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Learning Tips -->
+        <div id="learning" class="tip-category">
+            <div class="category-header">
+                <span class="category-icon">📚</span>
+                <h2 class="category-title">ส่งเสริมการเรียนรู้</h2>
+            </div>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-number">1</div>
+                    <h3 class="tip-title">แบ่งเวลาเรียนเป็นช่วงสั้นๆ</h3>
+                    <p class="tip-content">เด็ก ADHD มีสมาธิสั้น ควรแบ่งเป็นช่วง 15-20 นาที แล้วพักสักครู่</p>
+                    <div class="tip-example">ใช้นาฬิกาตั้งเวลา เรียน 15 นาที พัก 5 นาที</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">2</div>
+                    <h3 class="tip-title">ใช้การเรียนรู้แบบลงมือทำ</h3>
+                    <p class="tip-content">เด็ก ADHD เรียนรู้ได้ดีเมื่อได้ใช้ร่างกายและประสาทสัมผัส</p>
+                    <div class="tip-example">เรียนคณิตศาสตร์โดยใช้ของจริง เช่น ลูกปัด หรือขนม</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">3</div>
+                    <h3 class="tip-title">สร้างที่ทำการบ้านเฉพาะ</h3>
+                    <p class="tip-content">จัดพื้นที่เรียนที่เงียบ ไม่มีสิ่งรบกวน และมีอุปกรณ์ครบครัน</p>
+                    <div class="tip-example">โต๊ะเรียนหันหลังให้กับหน้าต่าง ไม่มีของเล่นบนโต๊ะ</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">4</div>
+                    <h3 class="tip-title">ใช้เพลงและจังหวะ</h3>
+                    <p class="tip-content">ดนตรีและจังหวะช่วยให้เด็กจำและเรียนรู้ได้ดีขึ้น</p>
+                    <div class="tip-example">ท่องสูตรคูณหรือสะกดคำด้วยเพลง</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">5</div>
+                    <h3 class="tip-title">ให้ความช่วยเหลือในการจดจำ</h3>
+                    <p class="tip-content">ใช้เครื่องมือช่วยจำ เช่น สีสัน รูปภาพ หรือคำสั่งสั้นๆ</p>
+                    <div class="tip-example">ไฮไลต์ข้อความสำคัญด้วยสีต่างๆ</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">6</div>
+                    <h3 class="tip-title">ชื่นชมความพยายาม</h3>
+                    <p class="tip-content">มุ่งเน้นที่ความพยายามมากกว่าผลลัพธ์ เพื่อสร้างแรงจูงใจ</p>
+                    <div class="tip-example">"แม่เห็นว่าลูกตั้งใจทำการบ้านมาก" แทนที่จะว่า "ทำไมผิดเยอะ"</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Behavior Tips -->
+        <div id="behavior" class="tip-category">
+            <div class="category-header">
+                <span class="category-icon">🎯</span>
+                <h2 class="category-title">การจัดการพฤติกรรม</h2>
+            </div>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-number">1</div>
+                    <h3 class="tip-title">ตั้งกฎที่ชัดเจนและสม่ำเสมอ</h3>
+                    <p class="tip-content">กำหนดกฎง่ายๆ ไม่เยอะ และปฏิบัติอย่างสม่ำเสมอ</p>
+                    <div class="tip-example">กฎบ้าน: 1.พูดด้วยเสียงเบา 2.เก็บของหลังใช้ 3.ช่วยงานบ้าน</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">2</div>
+                    <h3 class="tip-title">ใช้การเสริมแรงเชิงบวก</h3>
+                    <p class="tip-content">ให้ความสนใจและชื่นชมเมื่อเด็กทำพฤติกรรมที่ดี</p>
+                    <div class="tip-example">เมื่อเด็กเก็บของเล่น ให้กอดและขอบคุณทันที</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">3</div>
+                    <h3 class="tip-title">หลีกเลี่ยงการลงโทษทางกาย</h3>
+                    <p class="tip-content">ใช้วิธีการลงโทษที่เหมาะสม เช่น การถูกจำกัดสิทธิบางอย่าง</p>
+                    <div class="tip-example">หากเด็กไม่เก็บของเล่น ให้เก็บของเล่นนั้นไว้ 1 วัน</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">4</div>
+                    <h3 class="tip-title">ช่วยเด็กระบายพลังงาน</h3>
+                    <p class="tip-content">จัดกิจกรรมการออกกำลังกายหรือเคลื่อนไหวเป็นประจำ</p>
+                    <div class="tip-example">วิ่งเล่น เต้นรำ หรือปั่นจักรยานก่อนทำการบ้าน</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">5</div>
+                    <h3 class="tip-title">สอนทักษะการคิดก่อนทำ</h3>
+                    <p class="tip-content">ฝึกให้เด็กหยุดคิดก่อนตัดสินใจหรือกระทำการใดๆ</p>
+                    <div class="tip-example">สอนให้นับ 1-2-3 ก่อนตอบคำถาม</div>
+                </div>
+                
+                <div class="tip-card">
+                        <div class="tip-number">6</div>
+                        <h3 class="tip-title">ใจเย็นและอดทน</h3>
+                        <p class="tip-content">เด็กที่มีภาวะ ADHD ต้องการความเข้าใจและเวลามากกว่าปกติในการปรับพฤติกรรม</p>
+                        <div class="tip-example">หากเด็กทำผิดซ้ำ ควรพูดคุยด้วยน้ำเสียงสงบ แทนที่จะตะโกน</div>
+                    </div>
+                </div>
+            </div>
+            <!-- Emotional Tips -->
+        <div id="emotional" class="tip-category">
+            <div class="category-header">
+                <span class="category-icon">💖</span>
+                <h2 class="category-title">การจัดการอารมณ์</h2>
+            </div>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-number">1</div>
+                    <h3 class="tip-title">สอนให้รู้จักอารมณ์ตนเอง</h3>
+                    <p class="tip-content">ช่วยเด็กให้ชื่อและระบุอารมณ์ที่กำลังรู้สึก เพื่อเข้าใจตนเองมากขึ้น</p>
+                    <div class="tip-example">ใช้หน้าการ์ดอารมณ์ หรือถาม "ตอนนี้ลูกรู้สึกยังไง? โกรธ เศร้า หรือดีใจ?"</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">2</div>
+                    <h3 class="tip-title">สอนเทคนิคการผ่อนคลาย</h3>
+                    <p class="tip-content">ฝึกวิธีการสงบจิตใจเมื่ออารมณ์เสีย เช่น การหายใจลึกหรือนับเลข</p>
+                    <div class="tip-example">สอนให้หายใจเข้า 4 จังหวะ กลั้น 4 จังหวะ หายใจออก 4 จังหวะ</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">3</div>
+                    <h3 class="tip-title">สร้างมุมปลอบใจ</h3>
+                    <p class="tip-content">จัดพื้นที่เงียบสงบที่เด็กสามารถไปสงบอารมณ์เมื่อรู้สึกหงุดหงิด</p>
+                    <div class="tip-example">มุมโซฟาพร้อมหมอนนุ่ม ตุ๊กตา และหนังสือสำหรับผ่อนคลาย</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">4</div>
+                    <h3 class="tip-title">ใช้การฟังเป็นหลัก</h3>
+                    <p class="tip-content">ให้ความสนใจและรับฟังความรู้สึกของเด็ก โดยไม่รีบตัดสินหรือแก้ไข</p>
+                    <div class="tip-example">"แม่เข้าใจที่ลูกโกรธ เล่าให้แม่ฟังหน่อยว่าเกิดอะไรขึ้น"</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">5</div>
+                    <h3 class="tip-title">ตั้งขอบเขตอย่างใจเย็น</h3>
+                    <p class="tip-content">เมื่อเด็กมีอารมณ์รุนแรง ยังคงรักษากฎและขอบเขตแต่ด้วยวิธีที่อ่อนโยน</p>
+                    <div class="tip-example">"แม่เข้าใจที่ลูกโกรธ แต่ลูกต้องไม่ทำร้ายใคร มาหาวิธีอื่นกันดีกว่า"</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">6</div>
+                    <h3 class="tip-title">สร้างความมั่นใจในตนเอง</h3>
+                    <p class="tip-content">มองหาจุดเด่นของเด็กและชื่นชมเป็นประจำ เพื่อสร้างภาพลักษณ์ที่ดีต่อตนเอง</p>
+                    <div class="tip-example">"ลูกวาดรูปสวยมาก มีจินตนาการดีจริงๆ"</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Communication Tips -->
+        <div id="communication" class="tip-category">
+            <div class="category-header">
+                <span class="category-icon">💬</span>
+                <h2 class="category-title">การสื่อสารที่มีประสิทธิภาพ</h2>
+            </div>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-number">1</div>
+                    <h3 class="tip-title">พูดคำสั่งให้ชัดเจนและสั้น</h3>
+                    <p class="tip-content">ใช้ประโยคสั้นๆ ชัดเจน หลีกเลี่ยงการให้คำสั่งหลายอย่างในครั้งเดียว</p>
+                    <div class="tip-example">"ไปแปรงฟัน" แทนที่จะพูดว่า "ไปแปรงฟัน แล้วล้างหน้า เปลี่ยนเสื้อผ้า และมานั่งกินข้าว"</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">2</div>
+                    <h3 class="tip-title">ใช้น้ำเสียงสงบและใจเย็น</h3>
+                    <p class="tip-content">การพูดด้วยเสียงเบาและอารมณ์ดีจะช่วยให้เด็กรู้สึกปลอดภัยและเชื่อฟัง</p>
+                    <div class="tip-example">แทนที่จะตะโกน ให้นั่งลงพูดใกล้ๆ เด็กด้วยน้ำเสียงเบา</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">3</div>
+                    <h3 class="tip-title">ให้สบตาขณะพูด</h3>
+                    <p class="tip-content">ขอให้เด็กมองหน้าเมื่อพูดคุย เพื่อให้มั่นใจว่าเด็กกำลังตั้งใจฟัง</p>
+                    <div class="tip-example">"ลูก มองหน้าแม่หน่อย แม่จะบอกอะไรสำคัญ"</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">4</div>
+                    <h3 class="tip-title">ใช้คำถามเปิด</h3>
+                    <p class="tip-content">ถามคำถามที่ให้เด็กได้อธิบาย แทนการถามแบบใช่/ไม่ใช่</p>
+                    <div class="tip-example">"วันนี้ที่โรงเรียนเป็นยังไงบ้าง?" แทนที่จะถามว่า "วันนี้สนุกมั้ย?"</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">5</div>
+                    <h3 class="tip-title">ยืนยันความเข้าใจ</h3>
+                    <p class="tip-content">ขอให้เด็กทบทวนสิ่งที่เพิ่งได้ยิน เพื่อให้แน่ใจว่าเข้าใจตรงกัน</p>
+                    <div class="tip-example">"ลูกช่วยบอกแม่หน่อยว่า ลูกต้องทำอะไรบ้างก่อนออกไปเล่น"</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">6</div>
+                    <h3 class="tip-title">ให้เวลาในการตอบ</h3>
+                    <p class="tip-content">อย่ารีบร้อน ให้เวลาเด็กประมวลผลและคิดคำตอบ</p>
+                    <div class="tip-example">หลังจากถามคำถาม ให้รอ 5-10 วินาทีก่อนถามซ้ำ</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- School Tips -->
+        <div id="school" class="tip-category">
+            <div class="category-header">
+                <span class="category-icon">🏫</span>
+                <h2 class="category-title">การทำงานร่วมกับโรงเรียน</h2>
+            </div>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-number">1</div>
+                    <h3 class="tip-title">สื่อสารกับครูอย่างสม่ำเสมอ</h3>
+                    <p class="tip-content">สร้างความสัมพันธ์ที่ดีกับครูและแจ้งให้ทราบเกี่ยวกับภาวะของลูก</p>
+                    <div class="tip-example">แชร์เทคนิคที่ได้ผลดีที่บ้านให้ครูลองนำไปใช้ในชั้นเรียน</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">2</div>
+                    <h3 class="tip-title">จัดทำแผนการศึกษาเฉพาะบุคคล</h3>
+                    <p class="tip-content">ร่วมมือกับโรงเรียนในการวางแผนการเรียนรู้ที่เหมาะสมกับลูก</p>
+                    <div class="tip-example">ขอเวลาสอบเพิ่ม หรือให้นั่งในตำแหน่งที่เหมาะสมในชั้นเรียน</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">3</div>
+                    <h3 class="tip-title">ติดตามการบ้านอย่างใกล้ชิด</h3>
+                    <p class="tip-content">ช่วยลูกจัดระเบียบการบ้านและตรวจสอบความครบถ้วน</p>
+                    <div class="tip-example">ใช้สมุดบันทึกการบ้าน หรือแอปในโทรศัพท์เพื่อติดตาม</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">4</div>
+                    <h3 class="tip-title">สร้างแรงจูงใจในการเรียน</h3>
+                    <p class="tip-content">หาวิธีทำให้การเรียนสนุกและเชื่อมโยงกับสิ่งที่ลูกสนใจ</p>
+                    <div class="tip-example">หากลูกชอบไดโนเสาร์ ใช้ไดโนเสาร์เป็นตัวอย่างในการเรียนคณิตหรือวิทย์</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">5</div>
+                    <h3 class="tip-title">สนับสนุนกิจกรรมพิเศษ</h3>
+                    <p class="tip-content">ส่งเสริมให้ลูกเข้าร่วมกิจกรรมที่สามารถใช้พลังงานและความสามารถพิเศษ</p>
+                    <div class="tip-example">กีฬา ดนตรี ศิลปะ หรือชมรมที่ตรงกับความถนัดของลูก</div>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-number">6</div>
+                    <h3 class="tip-title">เตรียมพร้อมสำหรับการเปลี่ยนแปลง</h3>
+                    <p class="tip-content">ช่วยลูกปรับตัวกับการเปลี่ยนแปลงต่างๆ ในโรงเรียน</p>
+                    <div class="tip-example">เยี่ยมชมโรงเรียนใหม่ก่อนเปิดเทอม หรือพบครูใหม่ล่วงหน้า</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Tips Section -->
+    <div class="emergency-section loading" style="animation-delay: 0.8s;">
+        <div class="emergency-header">
+            <span style="font-size: 2em;">🚨</span>
+            <h3 class="emergency-title">เมื่อเกิดสถานการณ์ฉุกเฉิน</h3>
+        </div>
+        <div class="emergency-content">
+            <div class="emergency-tip">
+                <h4><span>😤</span> เมื่อลูกโกรธจัด</h4>
+                <p>อยู่ใกล้ๆ แต่ให้พื้นที่ พูดเบาๆ ว่า "แม่อยู่ตรงนี้ เมื่อไหร่ลูกพร้อมจะคุยกันได้"</p>
+            </div>
+            <div class="emergency-tip">
+                <h4><span>😢</span> เมื่อลูกเศร้ามาก</h4>
+                <p>กอดและบอกว่ารัก ไม่ต้องรีบแก้ปัญหา ให้ความอบอุ่นก่อน</p>
+            </div>
+            <div class="emergency-tip">
+                <h4><span>😰</span> เมื่อลูกวิตกกังวล</h4>
+                <p>ใช้เทคนิคการหายใจ 4-4-4 และบอกว่า "เราจะแก้ปัญหาไปด้วยกัน"</p>
+            </div>
+            <div class="emergency-tip">
+                <h4><span>🤯</span> เมื่อลูกครื้นขนาดหยุดไม่ได้</h4>
+                <p>รักษาความปลอดภัย ไม่พูดมาก รอให้สงบก่อน แล้วค่อยปลอบใจ</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resources Section -->
+    <div class="resources-section loading" style="animation-delay: 1s;">
+        <h3 class="resources-title">
+            <span>📋</span>
+            <span>แหล่งข้อมูลเพิ่มเติม</span>
+        </h3>
+        <div class="resources-grid">
+            <div class="resource-item" onclick="alert('ติดต่อโรงพยาบาลใกล้บ้าน หรือแพทย์เฉพาะทางเด็ก')">
+                <div class="resource-icon">🏥</div>
+                <div class="resource-title">แพทย์เฉพาะทาง</div>
+                <div class="resource-desc">จิตแพทย์เด็ก กุมารแพทย์</div>
+            </div>
+            <div class="resource-item" onclick="alert('หาข้อมูลจากสมาคมผู้ปกครองเด็ก ADHD ประเทศไทย')">
+                <div class="resource-icon">👥</div>
+                <div class="resource-title">กลุ่มสนับสนุน</div>
+                <div class="resource-desc">ผู้ปกครองเด็ก ADHD</div>
+            </div>
+            <div class="resource-item" onclick="alert('ค้นหาหนังสือและบทความเกี่ยวกับ ADHD')">
+                <div class="resource-icon">📚</div>
+                <div class="resource-title">สื่อการเรียนรู้</div>
+                <div class="resource-desc">หนังสือ บทความ วีดิโอ</div>
+            </div>
+            <div class="resource-item" onclick="alert('ติดต่อนักจิตวิทยาโรงเรียน หรือครูแนะแนว')">
+                <div class="resource-icon">🎓</div>
+                <div class="resource-title">สนับสนุนการศึกษา</div>
+                <div class="resource-desc">นักจิตวิทยาโรงเรียน</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    function showCategory(categoryId) {
+        // ซ่อนทุกหมวดหมู่
+        const allCategories = document.querySelectorAll('.tip-category');
+        allCategories.forEach(c => {
+            c.classList.remove('active');
+        });
+
+        // แสดงเฉพาะหมวดที่เลือก
+        const selectedCategory = document.getElementById(categoryId);
+        if (selectedCategory) {
+            selectedCategory.classList.add('active');
+        }
+
+        // อัปเดตปุ่มที่ active
+        const buttons = document.querySelectorAll('.category-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+
+        // ทำให้ปุ่มที่กดมี class active
+        const clickedBtn = Array.from(buttons).find(btn =>
+            btn.getAttribute('onclick').includes(categoryId)
+        );
+        if (clickedBtn) {
+            clickedBtn.classList.add('active');
+        }
+    }
+    </script>
+
+</body>
+</html>
